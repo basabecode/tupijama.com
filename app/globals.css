@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Focus styles for better accessibility */
+@layer base {
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-orange-500;
+  }
+}
+
+/* Custom scrollbar */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-orange-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-orange-400;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* 3D Slider Effects */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1200px;
+    perspective-origin: center center;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .shadow-3xl {
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .perspective-1000 {
+    perspective: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .perspective-1000 {
+    perspective: 600px;
+  }
+
+  /* Simplify transforms for mobile */
+  .perspective-1000 > div > div {
+    transform: none !important;
+    position: relative !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .perspective-1000 > div > div > div {
+    scroll-snap-align: center !important;
+    flex-shrink: 0 !important;
+    margin-right: 1rem !important;
+  }
+}
