@@ -48,6 +48,10 @@ const calculateItemCount = (items: CartItem[]): number => {
   return items.reduce((count, item) => count + item.quantity, 0)
 }
 
+// Clave única estable para identificar items en acciones externas
+const getItemKey = (item: { id: string; size: string; color: string }) =>
+  `${item.id}-${item.size}-${item.color}`
+
 // Reducer del carrito
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
@@ -86,9 +90,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     }
 
     case 'REMOVE_ITEM': {
-      const [id, size, color] = action.payload.split('-')
       const newItems = state.items.filter(
-        item => !(item.id === id && item.size === size && item.color === color)
+        item => getItemKey(item) !== action.payload
       )
       return {
         ...state,
@@ -99,10 +102,9 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     }
 
     case 'UPDATE_QUANTITY': {
-      const [id, size, color] = action.payload.id.split('-')
       const newItems = state.items
         .map(item =>
-          item.id === id && item.size === size && item.color === color
+          getItemKey(item) === action.payload.id
             ? {
                 ...item,
                 quantity: Math.max(

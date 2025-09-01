@@ -13,6 +13,7 @@ children,
 children: React.ReactNode
 }) {
 return (
+
 <html lang="es">
 <body>
 {/_ IMPORTANTE: CartProvider debe envolver TODA la aplicación _/}
@@ -43,6 +44,7 @@ children,
 children: React.ReactNode
 }) {
 return (
+
 <html lang="es">
 <body>
 <CartProvider>
@@ -60,7 +62,7 @@ return (
 // app/test-cart/page.tsx
 'use client'
 
-import ProductCard from '@/components/ProductCard'
+import ProductCard from '@/components/products/ProductCard'
 
 const testProducts = [
 {
@@ -78,6 +80,7 @@ maxStock: 10,
 
 export default function TestCartPage() {
 return (
+
 <div className="container mx-auto px-4 py-8">
 <h1 className="text-2xl font-bold mb-6">Prueba del Carrito</h1>
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

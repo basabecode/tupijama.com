@@ -3,7 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from '../contexts/CartContext'
-import CartSidebar from '../components/CartSidebar'
+import { WishlistProvider } from '../contexts/WishlistContext'
+import CartSidebar from '../components/features/CartSidebar'
 import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -57,9 +58,11 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <CartProvider>
-          {children}
-          <CartSidebar />
-          <Toaster />
+          <WishlistProvider>
+            {children}
+            <CartSidebar />
+            <Toaster />
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

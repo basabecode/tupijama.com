@@ -2,9 +2,9 @@
 
 import React from 'react'
 import { CartProvider } from '../contexts/CartContext'
-import Header from '../components/Header'
-import CartSidebar from '../components/CartSidebar'
-import ProductCard from '../components/ProductCard'
+import Header from '../components/layout/Header'
+import CartSidebar from '../components/features/CartSidebar'
+import ProductCard from '../components/products/ProductCard'
 
 // Datos de ejemplo de productos
 const sampleProducts = [

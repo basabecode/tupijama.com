@@ -50,15 +50,6 @@ export default function Banner() {
         <div className="absolute top-20 left-1/4 w-32 h-32 bg-gradient-to-r from-rose-300/40 to-pink-400/40 rounded-full blur-xl animate-float"></div>
       </div>
 
-      {/* Sales Banner - Parte inferior izquierda */}
-      <div className="absolute bottom-8 left-8 z-50">
-        <div className="bg-gradient-to-r from-rose-600 to-pink-600 text-white px-6 py-2 rounded-full shadow-xl">
-          <span className="font-bold text-sm lg:text-base">
-            🔥 Envío Gratis en Todo
-          </span>
-        </div>
-      </div>
-
       <div className="container mx-auto px-4 py-12 lg:py-16 relative z-10">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[65vh]">
           {/* Left Content - Fashion Brand Style - Ubicación y estilo original */}
@@ -111,40 +102,6 @@ export default function Banner() {
               <button className="group border-2 border-rose-300 text-rose-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 hover:scale-105 shadow-lg">
                 Ver Colección
               </button>
-            </div>
-
-            {/* Features */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 lg:pt-8">
-              <div className="text-center group">
-                <div className="w-12 h-12 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <span className="text-rose-500 text-xl">🚚</span>
-                </div>
-                <p className="text-sm text-gray-600 font-medium">
-                  Envío Gratis
-                </p>
-              </div>
-              <div className="text-center group">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <span className="text-green-500 text-xl">↩️</span>
-                </div>
-                <p className="text-sm text-gray-600 font-medium">
-                  Devoluciones
-                </p>
-              </div>
-              <div className="text-center group">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <span className="text-blue-500 text-xl">🔒</span>
-                </div>
-                <p className="text-sm text-gray-600 font-medium">Pago Seguro</p>
-              </div>
-              <div className="text-center group">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-violet-100 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                  <span className="text-purple-500 text-xl">⭐</span>
-                </div>
-                <p className="text-sm text-gray-600 font-medium">
-                  Calidad Premium
-                </p>
-              </div>
             </div>
           </div>
 

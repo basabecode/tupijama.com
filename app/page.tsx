@@ -1,14 +1,9 @@
-import Header from '@/components/Header'
-import Banner from '@/components/Banner'
-import ProductGrid from '@/components/ProductGrid'
-import ProductGridDatabase from '@/components/ProductGridDatabase'
+import { Header, Banner, Footer } from '@/components/layout'
+import { ProductGridDynamic } from '@/components/products'
+import { Testimonials, SpecialOffers, TrustBadges } from '@/components/features'
 import Categories from '@/components/Categories'
-import Testimonials from '@/components/Testimonials'
-import SpecialOffers from '@/components/SpecialOffers'
-import TrustBadges from '@/components/TrustBadges'
-import Brands from '@/components/Brands'
 import Contact from '@/components/Contact'
-import Footer from '@/components/Footer'
+import LatestCollections from '@/components/LatestCollections'
 import { supabase } from '@/lib/supabaseClient'
 
 async function getFeaturedProducts() {
@@ -17,7 +12,6 @@ async function getFeaturedProducts() {
       .from('products')
       .select('*')
       .eq('status', 'active')
-      .limit(8)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -51,17 +45,16 @@ export default async function Home() {
         <section id="home">
           <Banner />
           <TrustBadges />
-          <SpecialOffers />
         </section>
 
+        {/* 🌟 Últimas Colecciones - Nueva sección atractiva */}
+        <LatestCollections />
+
         {/* Productos Destacados desde la base de datos */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-8">
-              Productos Destacados
-            </h2>
+        <section className="py-8 bg-gray-50">
+          <div className="w-full">
             {featuredProducts.length > 0 ? (
-              <ProductGridDatabase products={featuredProducts} />
+              <ProductGridDynamic products={featuredProducts} />
             ) : (
               <div className="text-center py-12">
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-md mx-auto">
@@ -78,13 +71,16 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="shop">
-          <ProductGrid />
+        {/* Testimonials Section */}
+        <section id="testimonials">
           <Testimonials />
         </section>
+
+        {/* Ofertas Especiales */}
+        <SpecialOffers />
+
         <section id="categories">
           <Categories />
-          <Brands />
         </section>
         <section id="contact">
           <Contact />

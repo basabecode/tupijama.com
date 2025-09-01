@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import { X, Plus, Minus, Trash2, ShoppingBag, CreditCard } from 'lucide-react'
-import { useCart } from '../contexts/CartContext'
+import { useCart } from '../../contexts/CartContext'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 

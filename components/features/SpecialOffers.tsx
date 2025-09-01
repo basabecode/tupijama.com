@@ -44,7 +44,7 @@ export default function SpecialOffers() {
             � Ofertas Especiales
           </h2>
           <p className="text-lg text-gray-600">
-            ¡No te pierdas estas increíbles ofertas! Solo por tiempo limitado
+            ¡tupijamaincreíbles ofertas! Solo por tiempo limitado
           </p>
         </div>
 

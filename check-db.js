@@ -40,7 +40,8 @@ if (fs.existsSync(productsPath)) {
   console.log('✓ Archivo data/products.json encontrado')
 
   try {
-    const products = JSON.parse(fs.readFileSync(productsPath, 'utf8'))
+    const productsData = JSON.parse(fs.readFileSync(productsPath, 'utf8'))
+    const products = productsData.products || []
     console.log(`✓ ${products.length} productos encontrados en el archivo JSON`)
 
     products.forEach((product, index) => {

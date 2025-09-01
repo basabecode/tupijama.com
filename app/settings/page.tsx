@@ -5,7 +5,7 @@ import { supabaseBrowser } from '@/lib/supabaseBrowser'
 import { useRouter } from 'next/navigation'
 import { Settings, Key, Bell, Eye, Shield, Trash2, Save } from 'lucide-react'
 import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import Footer from '@/components/layout/Footer'
 
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null)

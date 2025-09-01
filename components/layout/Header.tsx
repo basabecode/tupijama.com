@@ -14,9 +14,8 @@ import {
   CreditCard,
   ChevronDown,
 } from 'lucide-react'
-import { useCart } from '../contexts/CartContext'
-import { useWishlist } from '../contexts/WishlistContext'
-import MultiImageSelector from './MultiImageSelector'
+import { useCart } from '../../contexts/CartContext'
+import MultiImageSelector from '../MultiImageSelector'
 import Link from 'next/link'
 import { supabaseBrowser } from '@/lib/supabaseBrowser'
 import { useRouter } from 'next/navigation'
@@ -26,6 +25,8 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isWishlistOpen, setIsWishlistOpen] = useState(false)
+  const [wishlistItems, setWishlistItems] = useState<any[]>([])
+  const [wishlistCount, setWishlistCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchRetryCount, setSearchRetryCount] = useState(0)
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -36,6 +37,10 @@ export default function Header() {
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<any>(null)
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [selectedVariations, setSelectedVariations] = useState<
+    { index: number; image: string; variationName: string }[]
+  >([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -43,6 +48,7 @@ export default function Header() {
   const [mounted, setMounted] = useState(false) // Para evitar hydration mismatch
   const router = useRouter()
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const searchDropdownRef = useRef<HTMLDivElement>(null)
 
   const {
     itemCount: cartItemCount,
@@ -50,22 +56,22 @@ export default function Header() {
     addItem,
   } = useCart()
 
-  // Usar WishlistContext en lugar de localStorage
-  const {
-    state: wishlistState,
-    removeItem: removeFromWishlist,
-    addItem: addToWishlist,
-  } = useWishlist()
+  // Actualizar contador de wishlist
+  const updateWishlistCount = () => {
+    if (mounted && typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]')
+        setWishlistCount(wishlist.length)
+        setWishlistItems(wishlist)
+      } catch (error) {
+        console.error('Error reading wishlist from localStorage:', error)
+        setWishlistCount(0)
+        setWishlistItems([])
+      }
+    }
+  }
 
-  // Estado para selecciones múltiples en modal de detalles
-  const [selectedVariations, setSelectedVariations] = useState<
-    {
-      index: number
-      image: string
-      variationName: string
-    }[]
-  >([])
-  const [selectedSize, setSelectedSize] = useState<string>('')
+  // Cargar productos para búsqueda
   const [allProducts, setAllProducts] = useState<any[]>([])
   const [isLoadingProducts, setIsLoadingProducts] = useState(true)
 
@@ -146,30 +152,38 @@ export default function Header() {
   // Cargar productos solo después del montaje
   useEffect(() => {
     if (mounted) {
+      updateWishlistCount()
       loadAllProducts()
+    }
+
+    // Escuchar cambios en wishlist
+    const handleWishlistUpdate = () => {
+      if (mounted) {
+        updateWishlistCount()
+      }
     }
 
     // Escuchar eventos de detalles de producto
     const handleProductDetailsEvent = (event: any) => {
-      setSelectedProduct(event.detail)
-      setSelectedVariations([]) // Limpiar selecciones previas
-
-      // Auto-seleccionar la primera talla disponible
+      const detail = event.detail
+      setSelectedProduct(detail)
+      // Autoseleccionar primera talla disponible si existe
       const firstSize =
-        Array.isArray(event.detail.size) && event.detail.size.length > 0
-          ? event.detail.size[0]
-          : Array.isArray(event.detail.sizes) && event.detail.sizes.length > 0
-          ? event.detail.sizes[0]
-          : ''
-      setSelectedSize(firstSize)
-
+        Array.isArray(detail?.size) && detail.size.length > 0
+          ? detail.size[0]
+          : null
+      setSelectedSize(firstSize || null)
+      // Resetear variaciones seleccionadas
+      setSelectedVariations([])
       setIsProductDetailsOpen(true)
     }
 
     // Agregar event listeners
+    window.addEventListener('wishlistUpdated', handleWishlistUpdate)
     window.addEventListener('openProductDetails', handleProductDetailsEvent)
 
     return () => {
+      window.removeEventListener('wishlistUpdated', handleWishlistUpdate)
       window.removeEventListener(
         'openProductDetails',
         handleProductDetailsEvent
@@ -261,7 +275,7 @@ export default function Header() {
     }
   }, [mounted])
 
-  // Cerrar menú de usuario al hacer clic fuera
+  // Cerrar menú de usuario y dropdown de búsqueda al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -269,6 +283,13 @@ export default function Header() {
         !userMenuRef.current.contains(event.target as Node)
       ) {
         setIsUserMenuOpen(false)
+      }
+
+      if (
+        searchDropdownRef.current &&
+        !searchDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchResultsOpen(false)
       }
     }
 
@@ -458,6 +479,7 @@ export default function Header() {
   }
 
   const handleWishlistClick = () => {
+    updateWishlistCount() // Actualizar datos antes de abrir
     setIsWishlistOpen(true)
   }
 
@@ -568,13 +590,21 @@ export default function Header() {
           </nav>
 
           {/* Search bar - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-sm mx-4 lg:mx-6">
+          <div
+            className="hidden md:flex flex-1 max-w-sm mx-4 lg:mx-6 relative"
+            ref={searchDropdownRef}
+          >
             <form onSubmit={handleSearch} className="relative w-full">
               <input
                 type="search"
                 placeholder="Buscar pijamas..."
                 value={searchQuery}
                 onChange={e => handleSearchInputChange(e.target.value)}
+                onFocus={() => {
+                  if (searchResults.length > 0) {
+                    setIsSearchResultsOpen(true)
+                  }
+                }}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
                 aria-label="Search products"
               />
@@ -605,6 +635,107 @@ export default function Header() {
                 )}
               </button>
             </form>
+
+            {/* Search Results Dropdown */}
+            {mounted && isSearchResultsOpen && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                <div className="p-2">
+                  <div className="text-xs text-gray-500 px-2 py-1 border-b">
+                    {searchResults.length} resultado
+                    {searchResults.length !== 1 ? 's' : ''} para "{searchQuery}"
+                  </div>
+                  {searchResults.slice(0, 8).map((product: any) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center p-2 hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
+                      onClick={() => {
+                        // Emitir evento personalizado para abrir detalles del producto
+                        window.dispatchEvent(
+                          new CustomEvent('openProductDetails', {
+                            detail: product,
+                          })
+                        )
+                        setIsSearchResultsOpen(false)
+                        setSearchQuery('')
+                      }}
+                    >
+                      <div className="w-12 h-12 flex-shrink-0 mr-3">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-md"
+                          onError={e => {
+                            const target = e.target as HTMLImageElement
+                            if (target.src !== '/placeholder.jpg') {
+                              target.src = '/placeholder.jpg'
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-medium text-gray-900 truncate">
+                          {product.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 truncate">
+                          {product.category}
+                        </p>
+                        <p className="text-sm font-semibold text-rose-600">
+                          ${product.price?.toLocaleString('es-CO') || 'N/A'}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            addItem({
+                              id: product.id,
+                              name: product.name,
+                              price: product.price,
+                              image: product.image,
+                              size: product.size?.[0] || 'M',
+                              color: product.fabricType?.[0] || 'Algodón',
+                              maxStock: 10,
+                            })
+                          }}
+                          className="p-1.5 text-gray-400 hover:text-rose-500 transition-colors"
+                          title="Agregar al carrito"
+                        >
+                          <ShoppingCart size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {searchResults.length > 8 && (
+                    <div className="px-2 py-2 border-t text-center">
+                      <button
+                        onClick={() => {
+                          // Mostrar todos los resultados en modal (opcional)
+                          console.log('Ver todos los resultados')
+                        }}
+                        className="text-xs text-rose-600 hover:text-rose-700 font-medium"
+                      >
+                        Ver todos los {searchResults.length} resultados
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* No Results Message */}
+            {mounted &&
+              isSearchResultsOpen &&
+              searchResults.length === 0 &&
+              searchQuery.trim() && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="p-4 text-center">
+                    <Search size={24} className="mx-auto text-gray-300 mb-2" />
+                    <p className="text-sm text-gray-500">
+                      No se encontraron resultados para "{searchQuery}"
+                    </p>
+                  </div>
+                </div>
+              )}
           </div>
 
           {/* Actions */}
@@ -740,15 +871,13 @@ export default function Header() {
             <button
               onClick={handleWishlistClick}
               className="hidden sm:flex relative p-2 text-gray-700 hover:text-rose-500 transition-colors"
-              aria-label={`Wishlist with ${
-                mounted ? wishlistState.itemCount : 0
-              } items`}
+              aria-label={`Wishlist with ${mounted ? wishlistCount : 0} items`}
               title="guardados"
             >
               <Heart size={20} />
-              {mounted && wishlistState.itemCount > 0 && (
+              {mounted && wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  {wishlistState.itemCount}
+                  {wishlistCount}
                 </span>
               )}
             </button>
@@ -779,13 +908,18 @@ export default function Header() {
 
         {/* Mobile Search Bar */}
         {mounted && isSearchOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-100">
+          <div className="md:hidden pb-4 border-t border-gray-100 relative">
             <form onSubmit={handleSearch} className="relative mt-4">
               <input
                 type="search"
                 placeholder="Buscar pijamas hermosas..."
                 value={searchQuery}
                 onChange={e => handleSearchInputChange(e.target.value)}
+                onFocus={() => {
+                  if (searchResults.length > 0) {
+                    setIsSearchResultsOpen(true)
+                  }
+                }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-gray-50"
                 aria-label="Search products"
                 autoFocus
@@ -817,6 +951,105 @@ export default function Header() {
                 )}
               </button>
             </form>
+
+            {/* Mobile Search Results Dropdown */}
+            {mounted && isSearchResultsOpen && searchResults.length > 0 && (
+              <div className="absolute top-full left-4 right-4 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="p-2">
+                  <div className="text-xs text-gray-500 px-2 py-1 border-b">
+                    {searchResults.length} resultado
+                    {searchResults.length !== 1 ? 's' : ''} para "{searchQuery}"
+                  </div>
+                  {searchResults.slice(0, 6).map((product: any) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center p-2 hover:bg-gray-50 rounded-md cursor-pointer transition-colors"
+                      onClick={() => {
+                        window.dispatchEvent(
+                          new CustomEvent('openProductDetails', {
+                            detail: product,
+                          })
+                        )
+                        setIsSearchResultsOpen(false)
+                        setSearchQuery('')
+                        setIsSearchOpen(false)
+                      }}
+                    >
+                      <div className="w-10 h-10 flex-shrink-0 mr-2">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-md"
+                          onError={e => {
+                            const target = e.target as HTMLImageElement
+                            if (target.src !== '/placeholder.jpg') {
+                              target.src = '/placeholder.jpg'
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-medium text-gray-900 truncate">
+                          {product.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 truncate">
+                          {product.category}
+                        </p>
+                        <p className="text-sm font-semibold text-rose-600">
+                          ${product.price?.toLocaleString('es-CO') || 'N/A'}
+                        </p>
+                      </div>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation()
+                          addItem({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            size: product.size?.[0] || 'M',
+                            color: product.fabricType?.[0] || 'Algodón',
+                            maxStock: 10,
+                          })
+                        }}
+                        className="p-1.5 text-gray-400 hover:text-rose-500 transition-colors"
+                        title="Agregar al carrito"
+                      >
+                        <ShoppingCart size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  {searchResults.length > 6 && (
+                    <div className="px-2 py-2 border-t text-center">
+                      <button
+                        onClick={() => {
+                          setIsSearchResultsOpen(false)
+                          setIsSearchOpen(false)
+                        }}
+                        className="text-xs text-rose-600 hover:text-rose-700 font-medium"
+                      >
+                        Ver todos los {searchResults.length} resultados
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile No Results Message */}
+            {mounted &&
+              isSearchResultsOpen &&
+              searchResults.length === 0 &&
+              searchQuery.trim() && (
+                <div className="absolute top-full left-4 right-4 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="p-4 text-center">
+                    <Search size={20} className="mx-auto text-gray-300 mb-2" />
+                    <p className="text-sm text-gray-500">
+                      No se encontraron resultados para "{searchQuery}"
+                    </p>
+                  </div>
+                </div>
+              )}
           </div>
         )}
       </div>
@@ -955,9 +1188,9 @@ export default function Header() {
                 >
                   <Heart size={20} />
                   <span className="text-xs mt-1 font-medium">Favoritos</span>
-                  {mounted && wishlistState.itemCount > 0 && (
+                  {mounted && wishlistCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                      {wishlistState.itemCount}
+                      {wishlistCount}
                     </span>
                   )}
                 </button>
@@ -989,7 +1222,7 @@ export default function Header() {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-2xl font-bold text-gray-800">
-                ❤️ Mis Favoritos ({mounted ? wishlistState.itemCount : 0})
+                ❤️ Mis Favoritos ({mounted ? wishlistCount : 0})
               </h2>
               <button
                 onClick={() => setIsWishlistOpen(false)}
@@ -1000,7 +1233,7 @@ export default function Header() {
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[60vh]">
-              {wishlistState.items.length === 0 ? (
+              {wishlistItems.length === 0 ? (
                 <div className="text-center py-12">
                   <Heart size={64} className="mx-auto text-gray-300 mb-4" />
                   <h3 className="text-xl font-semibold text-gray-600 mb-2">
@@ -1019,7 +1252,7 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {wishlistState.items.map((item: any) => (
+                  {wishlistItems.map((item: any) => (
                     <div
                       key={item.id}
                       className="bg-gray-50 rounded-lg p-3 border hover:shadow-md transition-shadow"
@@ -1060,16 +1293,35 @@ export default function Header() {
                           <div className="flex space-x-2 mt-2">
                             <button
                               onClick={() => {
-                                // Agregar al carrito
-                                addItem({
-                                  id: item.id,
-                                  name: item.name,
-                                  price: item.price,
-                                  image: item.image,
-                                  size: item.size,
-                                  color: item.fabricType || item.color,
-                                  maxStock: item.maxStock || 10,
-                                })
+                                // Abrir modal de detalles para seleccionar talla antes de agregar
+                                const baseId = String(item.id).replace(
+                                  /-img-\d+$/,
+                                  ''
+                                )
+                                window.dispatchEvent(
+                                  new CustomEvent('openProductDetails', {
+                                    detail: {
+                                      id: baseId,
+                                      name: item.name,
+                                      price: item.price,
+                                      image: item.image,
+                                      images: [item.image],
+                                      description:
+                                        selectedProduct?.description || '',
+                                      category:
+                                        selectedProduct?.category || 'General',
+                                      size: Array.isArray(item.size)
+                                        ? item.size
+                                        : selectedProduct?.size || ['M'],
+                                      fabricType: item.fabricType ||
+                                        selectedProduct?.fabricType || [
+                                          'Algodón',
+                                        ],
+                                      maxStock: item.maxStock || 10,
+                                    },
+                                  })
+                                )
+                                setIsWishlistOpen(false)
                               }}
                               className="flex-1 bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 transition-colors"
                             >
@@ -1077,8 +1329,15 @@ export default function Header() {
                             </button>
                             <button
                               onClick={() => {
-                                // Remover de wishlist usando el Context
-                                removeFromWishlist(item.id)
+                                // Remover de wishlist
+                                const updatedWishlist = wishlistItems.filter(
+                                  (w: any) => w.id !== item.id
+                                )
+                                localStorage.setItem(
+                                  'wishlist',
+                                  JSON.stringify(updatedWishlist)
+                                )
+                                updateWishlistCount()
                               }}
                               className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 transition-colors"
                             >
@@ -1096,8 +1355,8 @@ export default function Header() {
         </div>
       )}
 
-      {/* Modal de Resultados de Búsqueda */}
-      {mounted && isSearchResultsOpen && (
+      {/* Modal de Resultados de Búsqueda - DESHABILITADO, usando dropdown */}
+      {false && mounted && isSearchResultsOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[80vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b">
@@ -1211,9 +1470,9 @@ export default function Header() {
       {/* Modal de Detalles de Producto */}
       {mounted && isProductDetailsOpen && selectedProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-2xl font-bold text-gray-800">
+          <div className="bg-white rounded-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-50 to-emerald-50">
+              <h2 className="text-3xl font-bold text-gray-800">
                 {selectedProduct.name}
               </h2>
               <button
@@ -1224,212 +1483,210 @@ export default function Header() {
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto max-h-[70vh]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="p-6 overflow-y-auto max-h-[80vh]">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Selector múltiple de imágenes */}
-                <div className="space-y-4">
+                <div className="lg:col-span-2">
                   <MultiImageSelector
-                    images={selectedProduct.images || [selectedProduct.image]}
+                    images={
+                      Array.isArray(selectedProduct.images) &&
+                      selectedProduct.images.length > 0
+                        ? selectedProduct.images
+                        : [selectedProduct.image]
+                    }
                     productName={selectedProduct.name}
                     maxSelections={5}
                     onSelectionChange={setSelectedVariations}
                   />
                 </div>
 
-                {/* Información del producto */}
-                <div className="space-y-6">
+                {/* Información y acciones */}
+                <div className="lg:col-span-1 space-y-6 bg-gray-50 rounded-xl p-6">
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-2 leading-tight">
                       {selectedProduct.name}
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-600 mb-4 leading-relaxed">
                       {selectedProduct.description ||
-                        'Descripción no disponible'}
+                        'Pijama de alta calidad con materiales premium. Diseño cómodo y elegante perfecto para el descanso.'}
                     </p>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl font-bold text-emerald-600">
+                          $
+                          {selectedProduct.price?.toLocaleString('es-CO') ||
+                            'N/A'}
+                        </span>
+                        {selectedProduct.originalPrice &&
+                          selectedProduct.originalPrice >
+                            selectedProduct.price && (
+                            <span className="text-lg text-gray-400 line-through">
+                              $
+                              {selectedProduct.originalPrice?.toLocaleString(
+                                'es-CO'
+                              )}
+                            </span>
+                          )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-4">
-                      <span className="text-3xl font-bold text-rose-600">
-                        $
-                        {selectedProduct.price?.toLocaleString('es-CO') ||
-                          'N/A'}
-                      </span>
-                      <span className="text-sm text-gray-500 line-through">
-                        $
-                        {selectedProduct.originalPrice?.toLocaleString('es-CO')}
-                      </span>
+                  {/* Selector de tallas */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2 uppercase tracking-wide">
+                      Tallas Disponibles
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {Array.isArray(selectedProduct.size) &&
+                      selectedProduct.size.length > 0 ? (
+                        selectedProduct.size.map((size: string) => (
+                          <button
+                            key={size}
+                            onClick={() => setSelectedSize(size)}
+                            className={`w-full py-2 border-2 rounded-lg text-sm font-semibold transition-all ${
+                              selectedSize === size
+                                ? 'border-blue-600 bg-blue-50 text-blue-700'
+                                : 'border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                            }`}
+                          >
+                            {size}
+                          </button>
+                        ))
+                      ) : (
+                        <span className="text-sm text-gray-500 col-span-4">
+                          Tallas no disponibles
+                        </span>
+                      )}
                     </div>
+                    {!selectedSize && (
+                      <p className="mt-2 text-xs text-red-600">
+                        Selecciona una talla
+                      </p>
+                    )}
+                  </div>
 
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Talla
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          {Array.isArray(selectedProduct.size) &&
-                          selectedProduct.size.length > 0 ? (
-                            selectedProduct.size.map((size: string) => (
-                              <button
-                                key={size}
-                                onClick={() => setSelectedSize(size)}
-                                className={`px-3 py-2 border rounded-md text-sm transition-colors ${
-                                  selectedSize === size
-                                    ? 'border-rose-500 bg-rose-50 text-rose-700'
-                                    : 'border-gray-300 hover:border-rose-500 hover:bg-rose-50'
-                                }`}
-                              >
-                                {size}
-                              </button>
-                            ))
-                          ) : (
-                            <span className="text-sm text-gray-500">
-                              Tallas no disponibles
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Tipo de Tela
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          {Array.isArray(selectedProduct.fabricType) &&
-                          selectedProduct.fabricType.length > 0 ? (
-                            selectedProduct.fabricType.map((fabric: string) => (
-                              <button
-                                key={fabric}
-                                className="px-3 py-2 border border-gray-300 rounded-md text-sm hover:border-rose-500 hover:bg-rose-50 transition-colors"
-                              >
-                                {fabric}
-                              </button>
-                            ))
-                          ) : (
-                            <span className="text-sm text-gray-500">
-                              Información no disponible
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                  {/* Tipos de tela (solo informativo) */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2 uppercase tracking-wide">
+                      Tipos de Tela
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {Array.isArray(selectedProduct.fabricType) &&
+                      selectedProduct.fabricType.length > 0 ? (
+                        selectedProduct.fabricType.map((fabric: string) => (
+                          <span
+                            key={fabric}
+                            className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 shadow-sm"
+                          >
+                            {fabric}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-sm text-gray-500">
+                          Información no disponible
+                        </span>
+                      )}
                     </div>
+                  </div>
 
-                    <div className="space-y-3 pt-4">
-                      <button
-                        onClick={() => {
-                          // Verificar que se haya seleccionado al menos una talla
-                          if (!selectedSize) {
-                            alert('Por favor selecciona una talla')
-                            return
-                          }
+                  {/* Acciones */}
+                  <div className="space-y-3 pt-4 border-t border-gray-200">
+                    <button
+                      disabled={
+                        !selectedSize || selectedVariations.length === 0
+                      }
+                      onClick={() => {
+                        if (!selectedSize || selectedVariations.length === 0)
+                          return
+                        const color =
+                          Array.isArray(selectedProduct.fabricType) &&
+                          selectedProduct.fabricType.length > 0
+                            ? selectedProduct.fabricType[0]
+                            : 'Algodón'
+                        selectedVariations.forEach(v => {
+                          const composedId = `${selectedProduct.id}-img${
+                            v.index + 1
+                          }-${selectedSize}`
+                          addItem({
+                            id: composedId,
+                            name: `${selectedProduct.name} - ${v.variationName}`,
+                            price: selectedProduct.price,
+                            image: v.image,
+                            size: selectedSize,
+                            color,
+                            maxStock: selectedProduct.maxStock || 10,
+                          })
+                        })
 
-                          if (selectedVariations.length === 0) {
-                            // Si no hay variaciones seleccionadas, agregar el producto base con la talla seleccionada
-                            addItem({
-                              id: `${selectedProduct.id}-${selectedSize}`,
-                              name: selectedProduct.name,
+                        setIsProductDetailsOpen(false)
+                      }}
+                      className={`w-full py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all ${
+                        selectedSize && selectedVariations.length > 0
+                          ? 'bg-gradient-to-r from-blue-600 to-emerald-600 text-white hover:from-blue-700 hover:to-emerald-700'
+                          : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      <ShoppingCart size={20} />
+                      {!selectedSize
+                        ? 'Selecciona una talla'
+                        : selectedVariations.length === 0
+                        ? 'Selecciona al menos un diseño'
+                        : `Agregar ${selectedVariations.length} diseño${
+                            selectedVariations.length > 1 ? 's' : ''
+                          } (talla ${selectedSize}) al carrito`}
+                    </button>
+
+                    <button
+                      disabled={selectedVariations.length === 0}
+                      onClick={() => {
+                        // Wishlist: solo imágenes, sin talla, sin duplicados
+                        if (selectedVariations.length === 0) return
+                        const existing = JSON.parse(
+                          localStorage.getItem('wishlist') || '[]'
+                        )
+
+                        const toAdd: any[] = []
+                        const seen = new Set(existing.map((it: any) => it.id))
+                        selectedVariations.forEach(v => {
+                          const wid = `${selectedProduct.id}-img-${v.index + 1}`
+                          if (!seen.has(wid)) {
+                            seen.add(wid)
+                            toAdd.push({
+                              id: wid,
+                              name: `${selectedProduct.name} - ${v.variationName}`,
                               price: selectedProduct.price,
-                              image: selectedProduct.image,
-                              size: selectedSize,
-                              color: Array.isArray(selectedProduct.fabricType)
-                                ? selectedProduct.fabricType[0]
-                                : 'Algodón',
-                              maxStock: 10,
-                            })
-                          } else {
-                            // Agregar cada combinación imagen + talla seleccionada
-                            selectedVariations.forEach(variation => {
-                              addItem({
-                                id: `${selectedProduct.id}-img${variation.index}-${selectedSize}`,
-                                name: `${selectedProduct.name} - ${variation.variationName}`,
-                                price: selectedProduct.price,
-                                image: variation.image,
-                                size: selectedSize,
-                                color: Array.isArray(selectedProduct.fabricType)
-                                  ? selectedProduct.fabricType[0]
-                                  : 'Algodón',
-                                maxStock: 10,
-                              })
+                              image: v.image,
+                              size: selectedProduct.size, // informativo
+                              fabricType: selectedProduct.fabricType,
+                              maxStock: selectedProduct.maxStock || 10,
                             })
                           }
+                        })
 
-                          // Limpiar selecciones y cerrar modal
-                          setSelectedVariations([])
-                          setSelectedSize('')
-                          setIsProductDetailsOpen(false)
-                        }}
-                        disabled={!selectedSize}
-                        className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
-                          !selectedSize
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-rose-500 text-white hover:bg-rose-600'
-                        }`}
-                      >
-                        {!selectedSize
-                          ? 'Selecciona una talla'
-                          : selectedVariations.length === 0
-                          ? 'Selecciona al menos un diseño'
-                          : selectedVariations.length === 1
-                          ? `Agregar 1 diseño (talla ${selectedSize}) al carrito`
-                          : `Agregar ${selectedVariations.length} diseños (talla ${selectedSize}) al carrito`}
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          if (selectedVariations.length === 0) {
-                            // Si no hay variaciones seleccionadas, agregar el producto base
-                            addToWishlist({
-                              id: selectedProduct.id,
-                              name: selectedProduct.name,
-                              price: selectedProduct.price,
-                              image: selectedProduct.image,
-                              size: Array.isArray(selectedProduct.size)
-                                ? selectedProduct.size[0]
-                                : 'M',
-                              color: Array.isArray(selectedProduct.fabricType)
-                                ? selectedProduct.fabricType[0]
-                                : 'Algodón',
-                              maxStock: 10,
-                            })
-                          } else {
-                            // Para wishlist: solo guardar cada imagen única (sin talla, evitar duplicados)
-                            const uniqueImages = new Set<string>()
-                            selectedVariations.forEach(variation => {
-                              if (!uniqueImages.has(variation.image)) {
-                                uniqueImages.add(variation.image)
-                                addToWishlist({
-                                  id: `${selectedProduct.id}-img-${variation.index}`,
-                                  name: `${selectedProduct.name} - ${variation.variationName}`,
-                                  price: selectedProduct.price,
-                                  image: variation.image,
-                                  size: 'Único', // Sin talla específica en wishlist
-                                  color: Array.isArray(
-                                    selectedProduct.fabricType
-                                  )
-                                    ? selectedProduct.fabricType[0]
-                                    : 'Algodón',
-                                  maxStock: 10,
-                                })
-                              }
-                            })
-                          }
-
-                          // Limpiar selecciones y cerrar modal
-                          setSelectedVariations([])
-                          setSelectedSize('')
-                          setIsProductDetailsOpen(false)
-                        }}
-                        disabled={false}
-                        className={`w-full border-2 py-3 px-6 rounded-lg font-semibold transition-colors border-red-500 text-red-500 hover:bg-red-50`}
-                      >
-                        ❤️{' '}
-                        {selectedVariations.length === 0
-                          ? 'Agregar producto a favoritos'
-                          : selectedVariations.length === 1
-                          ? 'Agregar 1 diseño a favoritos'
-                          : `Agregar ${selectedVariations.length} diseños a favoritos`}
-                      </button>
-                    </div>
+                        if (toAdd.length > 0) {
+                          const updated = [...existing, ...toAdd]
+                          localStorage.setItem(
+                            'wishlist',
+                            JSON.stringify(updated)
+                          )
+                          updateWishlistCount()
+                          window.dispatchEvent(new Event('wishlistUpdated'))
+                        }
+                        setIsProductDetailsOpen(false)
+                      }}
+                      className={`w-full border-2 py-3 px-6 rounded-xl transition-all duration-300 font-bold flex items-center justify-center gap-2 ${
+                        selectedVariations.length > 0
+                          ? 'border-red-500 text-red-500 hover:bg-red-50 hover:border-red-600'
+                          : 'border-gray-300 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      <Heart size={18} />
+                      {selectedVariations.length === 0
+                        ? 'Selecciona al menos un diseño'
+                        : selectedVariations.length > 1
+                        ? 'Agregar varios diseños a favoritos'
+                        : 'Agregar a favoritos'}
+                    </button>
                   </div>
                 </div>
               </div>
