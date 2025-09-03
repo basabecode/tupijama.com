@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabaseBrowser } from '@/lib/supabaseBrowser'
+import Link from 'next/link'
+import Image from 'next/image'
 
 export function UpdatePasswordForm() {
   const supabase = supabaseBrowser()
@@ -43,7 +45,23 @@ export function UpdatePasswordForm() {
   return (
     <div className="min-h-[60vh] grid place-items-center p-6">
       <div className="w-full max-w-sm border rounded-lg p-6 shadow-sm bg-white">
-        <h1 className="text-xl font-semibold mb-4">Actualizar contraseña</h1>
+        {/* Header con logo */}
+        <div className="text-center mb-6">
+          <Link href="/" aria-label="Ir al inicio" className="inline-block">
+            <Image
+              src="/logotipo/logo_edit_2.png"
+              alt="PijamaCandy Logo"
+              width={200}
+              height={60}
+              className="h-10 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity"
+              priority
+            />
+          </Link>
+        </div>
+
+        <h1 className="text-xl font-semibold mb-4 text-center">
+          Actualizar contraseña
+        </h1>
         {!ready ? (
           <p className="text-sm text-gray-600">Verificando enlace…</p>
         ) : (

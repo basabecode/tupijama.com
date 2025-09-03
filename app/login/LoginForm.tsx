@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabaseBrowser } from '@/lib/supabaseBrowser'
 import { useSearchParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import Image from 'next/image'
 import {
   Eye,
   EyeOff,
@@ -165,6 +167,24 @@ export function LoginForm() {
   return (
     <div className="min-h-[70vh] grid place-items-center p-6">
       <div className="w-full max-w-2xl border rounded-2xl p-6 md:p-8 shadow-sm bg-white">
+        {/* Header con logo */}
+        <div className="text-center mb-6">
+          <Link
+            href="/"
+            aria-label="Ir al inicio"
+            className="inline-block mb-4"
+          >
+            <Image
+              src="/logotipo/logo_edit_2.png"
+              alt="PijamaCandy Logo"
+              width={250}
+              height={80}
+              className="h-12 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity"
+              priority
+            />
+          </Link>
+        </div>
+
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold">
             {mode === 'signin' ? 'Iniciar sesión' : 'Crear cuenta'}
@@ -336,18 +356,11 @@ export function LoginForm() {
             </div>
             <div className="mt-5 text-sm text-gray-600 space-y-2">
               <p>
-                • Si eres administrador, te redirigiremos al panel al iniciar
-                sesión.
-              </p>
-              <p>
                 • Puedes usar contraseña o un enlace mágico enviado a tu correo.
               </p>
               <p>
-                • Asegúrate de permitir redirecciones a{' '}
-                {typeof window !== 'undefined'
-                  ? window.location.origin
-                  : 'tu dominio'}{' '}
-                en la consola de Supabase.
+                • Revisa tu bandeja de entrada y carpeta de spam después de
+                registrarte.
               </p>
             </div>
           </div>

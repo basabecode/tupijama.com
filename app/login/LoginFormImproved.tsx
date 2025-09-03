@@ -13,6 +13,7 @@ import {
   Home,
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type Mode = 'signin' | 'signup'
 type AuthMethod = 'password' | 'otp'
@@ -192,18 +193,21 @@ export function LoginFormImproved() {
 
         {/* Header con logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full mb-4">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className="flex flex-col items-center">
+            <Link href="/" aria-label="Ir al inicio" className="mb-4">
+              <Image
+                src="/logotipo/logo_edit_2.png"
+                alt="PijamaCandy Logo"
+                width={300}
+                height={100}
+                className="h-16 w-auto object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                priority
+              />
+            </Link>
+            <p className="text-gray-600 text-lg">
+              {mode === 'signin' ? 'Bienvenido de vuelta' : 'Crea tu cuenta'}
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
-              ✨ Dream
-            </span>
-            Wear
-          </h1>
-          <p className="text-gray-600">
-            {mode === 'signin' ? 'Bienvenido de vuelta' : 'Crea tu cuenta'}
-          </p>
         </div>
 
         {/* Card principal */}
@@ -496,14 +500,6 @@ export function LoginFormImproved() {
                   <p className="text-sm text-red-600">{message}</p>
                 </div>
               )}
-
-              {/* Nota para admins */}
-              <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs text-blue-600">
-                  💡 <strong>Tip:</strong> Si eres administrador, serás
-                  redirigido automáticamente al panel de administración.
-                </p>
-              </div>
             </>
           )}
         </div>
