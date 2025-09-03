@@ -10,14 +10,14 @@ import { Toaster } from '@/components/ui/toaster'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'tupijama - Pijamas y ropa de dormir | Envíos en Colombia',
+  title: 'PijamaCandy - Pijamas y ropa de dormir | Envíos en Colombia',
   description:
-    'tupijama ofrece pijamas cómodas y de calidad para toda la familia. Descubre colecciones para mujer, hombre y niños con envío rápido en Colombia y garantía de satisfacción.',
+    'PijamaCandy ofrece pijamas cómodas y de calidad para toda la familia. Descubre colecciones para mujer, hombre y niños con envío rápido en Colombia y garantía de satisfacción.',
   keywords:
     'pijamas, ropa de dormir, pijamas mujer, pijamas hombre, pijamas niños, pijama, Colombia, ropa cómoda, ropa de casa, pijama algodón',
-  authors: [{ name: 'Equipo tupijama' }],
-  creator: 'tupijama',
-  publisher: 'tupijama',
+  authors: [{ name: 'Equipo PijamaCandy' }],
+  creator: 'PijamaCandy',
+  publisher: 'PijamaCandy',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     url: 'https://tupijama.com',
     title: 'tupijama - Pijamas y ropa de dormir',
     description:
-      'Encuentra pijamas cómodas y diseños exclusivos para toda la familia. Compra fácil y recibe en Colombia con devolución sencilla.',
+      'Encuentra pijamas cómodas y diseños exclusivos para toda la familia. Compra fácil y recibe en Colombia con devolución en 15 días.',
     siteName: 'tupijama',
   },
   twitter: {
@@ -49,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <link rel="canonical" href="https://tupijama.com" />
         <meta name="format-detection" content="telephone=no" />
@@ -59,13 +59,13 @@ export default function RootLayout({
           rel="icon"
           type="image/png"
           sizes="32x32"
-          href="/favicon-32x32.png"
+          href="/logotipo/logo3_redondo.png"
         />
         <link
           rel="icon"
           type="image/png"
           sizes="16x16"
-          href="/favicon-16x16.png"
+          href="/logotipo/logo3_redondo.png"
         />
         <link
           rel="apple-touch-icon"
