@@ -186,7 +186,7 @@ export default function ProductGridDynamic({ products }: ProductGridProps) {
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent mb-4 px-4 py-2 leading-relaxed"
             style={{ lineHeight: '1.3' }}
           >
-            ✨ Catálogo Premium ✨
+            🛍️ Catálogo Completo
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4 leading-relaxed">
             Descubre nuestra selección exclusiva de pijamas premium, diseñadas

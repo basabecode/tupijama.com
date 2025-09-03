@@ -6,9 +6,9 @@ export default function SpecialOffers() {
   const offers = [
     {
       id: 1,
-      title: '💖 Super Sale',
-      description: 'Hasta 60% OFF en pijamas premium',
-      discount: '60%',
+      title: '💖 Super Oferta en Pijamas',
+      description: 'Hasta 20% OFF en pijamas de la mejor calidad',
+      discount: '20%',
       timeLeft: '2 días restantes',
       icon: Zap,
       bgColor: 'bg-primary-500',
@@ -16,9 +16,10 @@ export default function SpecialOffers() {
     },
     {
       id: 2,
-      title: '✨ Pack Dulces Sueños',
-      description: 'Compra 2 pijamas y llévate una bata GRATIS',
-      discount: '2+1 GRATIS',
+      title: '✨ Combo Dulces Sueños',
+      description:
+        'Compra 2 pijamas por el precio de 1 en producto seleccionado',
+      discount: '2x1 GRATIS',
       timeLeft: 'Tiempo limitado',
       icon: Gift,
       bgColor: 'bg-accent-500',
@@ -26,9 +27,9 @@ export default function SpecialOffers() {
     },
     {
       id: 3,
-      title: '🌙 Fin de Semana',
-      description: '20% extra con código DULCESSUEÑOS20',
-      discount: '20%',
+      title: '🌙 Oferta de Trasnocho',
+      description: '10% extra con código DULCESSUEÑOS en algunos productos',
+      discount: '10%',
       timeLeft: 'Solo este fin de semana',
       icon: Clock,
       bgColor: 'bg-secondary-500',
@@ -37,14 +38,17 @@ export default function SpecialOffers() {
   ]
 
   return (
-    <section className="py-16 bg-gradient-to-r from-primary-50 to-secondary-50">
+    <section
+      id="specialoffers"
+      className="py-16 bg-gradient-to-r from-primary-50 to-secondary-50 scroll-mt-28"
+    >
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            � Ofertas Especiales
+            Ofertas Especiales
           </h2>
           <p className="text-lg text-gray-600">
-            ¡tupijamaincreíbles ofertas! Solo por tiempo limitado
+            ¡Increíbles ofertas! Solo por tiempo limitado
           </p>
         </div>
 

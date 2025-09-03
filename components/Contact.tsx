@@ -3,7 +3,28 @@
 import type React from 'react'
 
 import { useState } from 'react'
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
+import { Phone, MapPin, Clock, Send } from 'lucide-react'
+
+// Icono de WhatsApp optimizado con mejor visual
+const WhatsappIcon = ({
+  size = 24,
+  className = '',
+}: {
+  size?: number
+  className?: string
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={`transition-transform hover:scale-110 ${className}`}
+    aria-label="WhatsApp"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.064 3.488" />
+  </svg>
+)
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -34,26 +55,28 @@ export default function Contact() {
   const contactInfo = [
     {
       icon: Phone,
-      title: 'Call Us',
-      details: ['+1 (555) 123-4567', 'Mon-Fri 9AM-6PM EST'],
+      title: 'Llámanos',
+      details: ['+57 (300) 309-4854', 'Lun-Vie 9AM-5PM EST'],
+      href: 'tel:+573003094854',
       color: 'text-blue-500',
     },
     {
-      icon: Mail,
-      title: 'Email Us',
-      details: ['support@tupijama.com', 'We reply within 24 hours'],
+      icon: WhatsappIcon,
+      title: 'WhatsApp',
+      details: ['+57 (300) 309-4854', 'Escríbenos por WhatsApp'],
       color: 'text-green-500',
+      href: 'https://wa.me/573003094854',
     },
     {
       icon: MapPin,
-      title: 'Visit Us',
-      details: ['123 Tech Street', 'Digital City, DC 12345'],
+      title: 'Somos Tienda Virtual',
+      details: ['Cra 3 #72A70', 'Cali, Valle del Cauca'],
       color: 'text-red-500',
     },
     {
       icon: Clock,
-      title: 'Business Hours',
-      details: ['Mon-Fri: 9AM-6PM', 'Sat-Sun: 10AM-4PM'],
+      title: 'Horario de Atención',
+      details: ['Lun-Vie: 9AM-5PM', 'Sab-Dom: 10AM-4PM'],
       color: 'text-purple-500',
     },
   ]
@@ -63,11 +86,11 @@ export default function Contact() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Get in Touch
+            Ponte en Contacto con Nosotros
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Have questions about our products or need support? We're here to
-            help!
+            ¿Tienes preguntas sobre nuestros productos o necesitas soporte?
+            ¡Estamos aquí para ayudar!
           </p>
         </div>
 
@@ -75,7 +98,7 @@ export default function Contact() {
           {/* Contact Information */}
           <div>
             <h3 className="text-2xl font-bold text-gray-800 mb-8">
-              Contact Information
+              Información de Contacto
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -87,7 +110,29 @@ export default function Contact() {
                     className="bg-white rounded-lg p-6 shadow-md"
                   >
                     <div className={`${info.color} mb-4`}>
-                      <Icon size={32} />
+                      {info.href ? (
+                        info.href.startsWith('tel:') ? (
+                          <a
+                            href={info.href}
+                            aria-label={`Llamar a ${info.title}`}
+                            className="inline-block transition-transform hover:scale-110"
+                          >
+                            <Icon size={32} className="cursor-pointer" />
+                          </a>
+                        ) : (
+                          <a
+                            href={info.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Abrir ${info.title} en nueva ventana`}
+                            className="inline-block transition-transform hover:scale-110"
+                          >
+                            <Icon size={32} className="cursor-pointer" />
+                          </a>
+                        )
+                      ) : (
+                        <Icon size={32} />
+                      )}
                     </div>
                     <h4 className="font-semibold text-gray-800 mb-2">
                       {info.title}
@@ -105,32 +150,33 @@ export default function Contact() {
             {/* FAQ Section */}
             <div className="bg-white rounded-lg p-6 shadow-md">
               <h4 className="font-semibold text-gray-800 mb-4">
-                Frequently Asked Questions
+                Preguntas Frecuentes
               </h4>
               <div className="space-y-3">
                 <div>
                   <p className="font-medium text-gray-700">
-                    How long does shipping take?
+                    ¿Cuánto tiempo tarda el envío?
                   </p>
                   <p className="text-sm text-gray-600">
-                    Standard shipping: 3-5 business days, Express: 1-2 business
-                    days
+                    Envío otros departamentos: 3-6 días hábiles, Express en
+                    Cali: 1-2 días hábiles
                   </p>
                 </div>
                 <div>
                   <p className="font-medium text-gray-700">
-                    What's your return policy?
+                    ¿Cuál es la política de devolución?
                   </p>
                   <p className="text-sm text-gray-600">
-                    30-day hassle-free returns on all products
+                    15 días de devolución sin complicaciones en todos los
+                    productos, debe estar en su estado original.
                   </p>
                 </div>
                 <div>
                   <p className="font-medium text-gray-700">
-                    Do you offer warranty?
+                    ¿Ofrecen garantía?
                   </p>
                   <p className="text-sm text-gray-600">
-                    Yes, all products come with manufacturer warranty
+                    Sí, todos los productos vienen con garantía del fabricante.
                   </p>
                 </div>
               </div>
@@ -141,7 +187,7 @@ export default function Contact() {
           <div>
             <div className="bg-white rounded-lg p-8 shadow-md">
               <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                Send us a Message
+                Envíanos un Mensaje
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -151,7 +197,7 @@ export default function Contact() {
                       htmlFor="name"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      Full Name *
+                      Nombre y Apellido:
                     </label>
                     <input
                       type="text"
@@ -161,7 +207,7 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="Your full name"
+                      placeholder="Tu nombre completo"
                     />
                   </div>
 
@@ -170,7 +216,7 @@ export default function Contact() {
                       htmlFor="email"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      Email Address *
+                      Correo Electrónico:
                     </label>
                     <input
                       type="email"
@@ -190,7 +236,7 @@ export default function Contact() {
                     htmlFor="subject"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Subject *
+                    Dirigido al área de:
                   </label>
                   <select
                     id="subject"
@@ -200,12 +246,13 @@ export default function Contact() {
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   >
-                    <option value="">Select a subject</option>
-                    <option value="product-inquiry">Product Inquiry</option>
-                    <option value="order-support">Order Support</option>
-                    <option value="technical-support">Technical Support</option>
-                    <option value="returns">Returns & Refunds</option>
-                    <option value="general">General Question</option>
+                    <option value="">Selecciona un área</option>
+                    <option value="product-inquiry">
+                      Consulta de Producto
+                    </option>
+                    <option value="order-support">Soporte de Pedido</option>
+                    <option value="returns">Devoluciones y Reembolsos</option>
+                    <option value="general">Pregunta General</option>
                   </select>
                 </div>
 
@@ -214,7 +261,7 @@ export default function Contact() {
                     htmlFor="message"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Message *
+                    Escribe tu mensaje:
                   </label>
                   <textarea
                     id="message"
@@ -230,10 +277,10 @@ export default function Contact() {
 
                 <button
                   type="submit"
-                  className="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-pink-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
                 >
                   <Send size={20} />
-                  Send Message
+                  Enviar Mensaje
                 </button>
               </form>
             </div>

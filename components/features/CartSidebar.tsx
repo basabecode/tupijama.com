@@ -378,7 +378,8 @@ const CartSidebar: React.FC = () => {
             {/* Información adicional */}
             <div className="mt-4 text-center">
               <p className="text-xs text-gray-500">
-                🔒 Compra segura • 💝 Envío gratis • ↩️ Devoluciones fáciles
+                🔒 Compra segura • 💝 Envío a todo el país • ↩️ Devoluciones 15
+                días
               </p>
             </div>
           </div>

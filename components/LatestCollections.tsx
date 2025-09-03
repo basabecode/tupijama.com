@@ -37,7 +37,6 @@ export default function LatestCollections() {
   const [latestProducts, setLatestProducts] = useState<LatestProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null)
-  const [activeCategory, setActiveCategory] = useState<string>('all')
   const [selectedImages, setSelectedImages] = useState<{
     [productId: string]: string
   }>({})
@@ -177,17 +176,8 @@ export default function LatestCollections() {
     handleWishlistToggle(product)
   }
 
-  // Obtener categorías únicas
-  const categories = [
-    'all',
-    ...Array.from(new Set(latestProducts.map(p => p.category))),
-  ]
-
-  // Filtrar productos por categoría
-  const filteredProducts =
-    activeCategory === 'all'
-      ? latestProducts
-      : latestProducts.filter(p => p.category === activeCategory)
+  // Usar la lista completa de productos filtrada (sin control de categoría)
+  const filteredProducts = latestProducts
 
   if (loading) {
     return (
@@ -231,7 +221,7 @@ export default function LatestCollections() {
           </div>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 bg-clip-text text-transparent mb-6 leading-tight">
-            ✨ Nuevas Colecciones
+            👚 Nuevas Colecciones
           </h2>
 
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
@@ -240,26 +230,11 @@ export default function LatestCollections() {
             descanso.
           </p>
 
-          {/* Filtros de categoría elegantes */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            {categories.map(category => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                  activeCategory === category
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
-                    : 'bg-white/80 text-gray-600 hover:bg-white hover:text-purple-600 shadow-md'
-                }`}
-              >
-                {category === 'all' ? 'Todas' : category}
-              </button>
-            ))}
-          </div>
+          {/* Filtro de categorías eliminado: mostrar todas las colecciones por defecto */}
         </div>
 
         {/* Layout tipo Magazine - Responsivo y Moderno */}
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto scroll-mt-28" id="collection-heading">
           {/* Hero Section - Producto Principal con fondo transparente creativo */}
           {filteredProducts[0] && (
             <div className="mb-8 lg:mb-12">

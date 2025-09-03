@@ -1,7 +1,6 @@
 import { Header, Banner, Footer } from '@/components/layout'
 import { ProductGridDynamic } from '@/components/products'
 import { Testimonials, SpecialOffers, TrustBadges } from '@/components/features'
-import Categories from '@/components/Categories'
 import Contact from '@/components/Contact'
 import LatestCollections from '@/components/LatestCollections'
 import { supabase } from '@/lib/supabaseClient'
@@ -79,9 +78,7 @@ export default async function Home() {
         {/* Ofertas Especiales */}
         <SpecialOffers />
 
-        <section id="categories">
-          <Categories />
-        </section>
+        {/* Categories removed per request */}
         <section id="contact">
           <Contact />
         </section>

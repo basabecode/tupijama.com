@@ -527,9 +527,9 @@ export default function Header() {
 
   const navigationItems = [
     { name: 'Inicio', href: '#home' },
-    { name: 'Tienda', href: '#shop' },
-    { name: 'Categorías', href: '#categories' },
-    { name: 'Ofertas', href: '#offers' },
+    { name: 'Tienda', href: '#products-heading' },
+    { name: 'Colección', href: '#collection-heading' },
+    { name: 'Ofertas', href: '#specialoffers' },
     { name: 'Contacto', href: '#contact' },
   ]
 
@@ -537,7 +537,7 @@ export default function Header() {
     <header className="bg-white shadow-lg sticky top-0 z-50" role="banner">
       <div className="container mx-auto px-4">
         {/* Main header - Una sola fila */}
-        <div className="flex items-center justify-between py-3 lg:py-4">
+        <div className="flex items-center justify-between py-1 lg:py-2">
           {/* Mobile Menu Button */}
           {mounted && (
             <button
@@ -560,12 +560,21 @@ export default function Header() {
 
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-gray-800">
+            <div className="mr-1 w-full max-w-[240px] sm:max-w-[300px] md:max-w-[380px] lg:max-w-[520px]">
+              <Link href="/" aria-label="Ir al inicio">
+                <img
+                  src="/logotipo/logo_edit_2.png"
+                  alt="PijamaCandy Logo"
+                  className="block w-full h-auto max-h-24 object-contain cursor-pointer"
+                />
+              </Link>
+            </div>
+            {/*<h1 className="text-xl lg:text-2xl xl:text-3xl font-bold text-gray-800">
               <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
-                ✨ Pijama
+              ✨ Pijama
               </span>
               Candy
-            </h1>
+            </h1>*/}
           </div>
 
           {/* Navigation - Desktop */}

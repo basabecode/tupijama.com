@@ -71,12 +71,12 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <div className="mb-6">
               <h3 className="text-2xl font-bold mb-4">
-                <span className="text-primary-500">✨ Dream</span>Wear
+                <span className="text-primary-500">✨ Pijama</span>Candy
               </h3>
               <p className="text-gray-300 mb-4 leading-relaxed">
                 Tu destino de confianza para las pijamas más cómodas y
                 elegantes. Ofrecemos productos premium diseñados especialmente
-                para el descanso perfecto de la mujer moderna.
+                para el descanso perfecto de la familia moderna.
               </p>
             </div>
 
@@ -84,16 +84,16 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Phone size={18} className="text-primary-500" />
-                <span className="text-gray-300">+1 (555) 123-4567</span>
+                <span className="text-gray-300">+57 (300) 309-4854</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail size={18} className="text-primary-500" />
-                <span className="text-gray-300">soporte@dreamwear.com</span>
+                <span className="text-gray-300">soporte@pijamacandy.com</span>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin size={18} className="text-primary-500" />
                 <span className="text-gray-300">
-                  123 Tech Street, Digital City, DC 12345
+                  Cra 3 # 72A70, Cali, Valle del Cauca
                 </span>
               </div>
             </div>

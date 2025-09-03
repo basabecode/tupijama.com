@@ -151,13 +151,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div
-      className="group flex h-[650px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:border-rose-200"
+      className="group flex h-[494px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:border-rose-200"
       onMouseEnter={startAutoRotate}
       onMouseLeave={stopAutoRotate}
     >
-      {/* Imagen del producto */}
+      {/* Imagen del producto - Reducida 20% */}
       <div
-        className="relative h-[420px] cursor-pointer overflow-hidden"
+        className="relative h-[336px] cursor-pointer overflow-hidden"
         onClick={handleViewDetails}
       >
         <img
@@ -192,33 +192,33 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        {/* Botón de favorito - Adelante y mejorado */}
+        {/* Botón de favorito - Reducido 20% */}
         <button
           onClick={e => {
             e.stopPropagation()
             handleWishlist()
           }}
-          className="absolute top-4 right-4 z-20 rounded-full bg-white/95 backdrop-blur-sm p-3 text-gray-600 shadow-lg transition-all hover:bg-white hover:scale-110"
+          className="absolute top-3 right-3 z-20 rounded-full bg-white/95 backdrop-blur-sm p-2 text-gray-600 shadow-lg transition-all hover:bg-white hover:scale-110"
           aria-label={
             isWishlisted ? 'Remover de favoritos' : 'Agregar a favoritos'
           }
         >
           <Heart
-            size={20}
+            size={16}
             className={`transition-colors ${
               isWishlisted ? 'fill-red-500 text-red-500' : 'hover:text-red-500'
             }`}
           />
         </button>
 
-        {/* Indicadores de imagen múltiple - Mejorados */}
+        {/* Indicadores de imagen múltiple - Reducidos */}
         {imageList.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-            <div className="flex gap-1.5">
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-10">
+            <div className="flex gap-1">
               {imageList.map((_, index) => (
                 <div
                   key={index}
-                  className={`h-2 w-2 rounded-full transition-all ${
+                  className={`h-1.5 w-1.5 rounded-full transition-all ${
                     index === currentIndex
                       ? 'bg-white shadow-md'
                       : 'bg-white/60'
@@ -230,25 +230,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
       </div>
 
-      {/* Contenido de información - Layout optimizado y controlado */}
-      <div className="flex h-[230px] flex-col p-4 text-center bg-white relative z-10">
-        {/* Nombre del producto - Altura fija */}
-        <div className="h-[40px] mb-1 flex items-center justify-center">
-          <h3 className="text-base font-semibold text-gray-900 leading-tight line-clamp-2">
+      {/* Contenido de información - Layout reducido 20% sin descripción */}
+      <div className="flex h-[158px] flex-col p-3 text-center bg-white relative z-10">
+        {/* Nombre del producto - Altura ajustada */}
+        <div className="h-[40px] mb-2 flex items-center justify-center">
+          <h3 className="text-sm font-semibold text-gray-900 leading-tight line-clamp-2">
             {name || 'Pijama Premium'}
           </h3>
         </div>
 
-        {/* Descripción del producto - Altura fija */}
-        <div className="h-[32px] mb-2 flex items-start justify-center">
-          <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">
-            {description || 'Pijama de alta calidad con materiales premium.'}
-          </p>
-        </div>
-
-        {/* Precio - Compacto */}
+        {/* Precio - Ajustado */}
         <div className="mb-3 flex items-center justify-center gap-2">
-          <span className="text-lg font-bold text-rose-600">
+          <span className="text-base font-bold text-rose-600">
             {formatPrice(price)}
           </span>
           {originalPrice && originalPrice > price && (
@@ -258,29 +251,29 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        {/* Botones horizontales - Compactos y eficientes */}
-        <div className="mb-2 flex gap-2">
+        {/* Botones horizontales - Más compactos */}
+        <div className="mb-1 flex gap-1.5">
           <button
             onClick={handleViewDetails}
-            className="flex-1 rounded-lg bg-gradient-to-r from-rose-500 to-pink-500 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:from-rose-600 hover:to-pink-600 hover:shadow-md"
+            className="flex-1 rounded-lg bg-gradient-to-r from-rose-500 to-pink-500 px-2 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:from-rose-600 hover:to-pink-600 hover:shadow-md"
             aria-label="Comprar"
           >
             <span className="inline-flex items-center justify-center gap-1">
-              <ShoppingCart size={14} /> Comprar
+              <ShoppingCart size={12} /> Comprar
             </span>
           </button>
           <button
             onClick={handleViewDetails}
-            className="flex-1 rounded-lg border-2 border-rose-500 px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
+            className="flex-1 rounded-lg border-2 border-rose-500 px-2 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50"
             aria-label="Ver modelos"
           >
             <span className="inline-flex items-center justify-center gap-1">
-              <Eye size={14} /> Ver
+              <Eye size={12} /> Ver
             </span>
           </button>
         </div>
 
-        {/* Stock disponible - Compacto */}
+        {/* Stock disponible - Más compacto */}
         <div className="text-center">
           <span
             className={`text-xs font-medium ${

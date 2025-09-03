@@ -16,8 +16,8 @@ export default function TrustBadges() {
     },
     {
       icon: Truck,
-      title: 'Envío Gratis',
-      description: 'En pedidos sobre $50',
+      title: 'Envío a todo el país',
+      description: 'Haz tu pedido hoy',
     },
     {
       icon: RotateCcw,
@@ -27,7 +27,7 @@ export default function TrustBadges() {
     {
       icon: Headphones,
       title: 'Soporte 24/7',
-      description: 'Atención al cliente experta',
+      description: 'Atención al cliente',
     },
     {
       icon: Award,
@@ -37,7 +37,7 @@ export default function TrustBadges() {
     {
       icon: CreditCard,
       title: 'Pago Flexible',
-      description: 'Múltiples opciones',
+      description: 'Múltiples opciones de pago',
     },
   ]
 

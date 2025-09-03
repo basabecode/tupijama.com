@@ -13,7 +13,7 @@ export default function Banner() {
     },
     {
       id: 2,
-      image: '/piyamas/tela_calis_2.jpg',
+      image: '/piyamas/levantadora_img3.jpg',
       alt: 'Conjunto Algodón Floral Elegante',
     },
     {
@@ -23,13 +23,18 @@ export default function Banner() {
     },
     {
       id: 4,
-      image: '/piyamas/tela_chalis_4.jpg',
+      image: '/piyamas/pantalon_buso_satin_img1.jpg',
       alt: 'Colección Satén Luxury',
     },
     {
       id: 5,
-      image: '/piyamas/tela_chalis_crepe.jpg',
+      image: '/piyamas/pijama_termica_img1.jpg',
       alt: 'Pijama Algodón Orgánico',
+    },
+    {
+      id: 6,
+      image: '/piyamas/short_tira_duzano_img13.jpg',
+      alt: 'Conjunto Algodón Floral Elegante',
     },
   ]
 
@@ -80,7 +85,16 @@ export default function Banner() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <button className="group bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 relative overflow-hidden">
+              <button
+                className="group bg-gradient-to-r from-rose-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 relative overflow-hidden"
+                onClick={() => {
+                  const productsSection =
+                    document.getElementById('products-heading')
+                  if (productsSection) {
+                    productsSection.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }}
+              >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Comprar Ahora
                   <svg
@@ -99,7 +113,16 @@ export default function Banner() {
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-rose-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
-              <button className="group border-2 border-rose-300 text-rose-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 hover:scale-105 shadow-lg">
+              <button
+                className="group border-2 border-rose-300 text-rose-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 hover:scale-105 shadow-lg"
+                onClick={() => {
+                  const collectionSection =
+                    document.getElementById('collection-heading')
+                  if (collectionSection) {
+                    collectionSection.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }}
+              >
                 Ver Colección
               </button>
             </div>
