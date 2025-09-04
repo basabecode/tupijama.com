@@ -15,7 +15,7 @@ import {
   Save,
   X,
 } from 'lucide-react'
-import Header from '@/components/Header'
+import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 
 type Address = {

@@ -12,6 +12,7 @@ import {
   Phone,
   MapPin,
 } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Footer() {
   const [email, setEmail] = useState('')
@@ -47,11 +48,11 @@ export default function Footer() {
       { name: 'Blog', href: '#' },
     ],
     support: [
-      { name: 'Centro de Ayuda', href: '#' },
-      { name: 'Información de Envío', href: '#' },
-      { name: 'Política de Devoluciones', href: '#' },
-      { name: 'Política de Privacidad', href: '#' },
-      { name: 'Términos de Servicio', href: '#' },
+      { name: 'Centro de Ayuda', href: '/soporte#faq' },
+      { name: 'Información de Envío', href: '/soporte#envios' },
+      { name: 'Política de Devoluciones', href: '/soporte#devoluciones' },
+      { name: 'Política de Privacidad', href: '/soporte#privacidad' },
+      { name: 'Términos de Servicio', href: '/soporte#terminos' },
     ],
   }
 
@@ -70,9 +71,24 @@ export default function Footer() {
           {/* Company info */}
           <div className="lg:col-span-2">
             <div className="mb-6">
-              <h3 className="text-2xl font-bold mb-4">
-                <span className="text-primary-500">✨ Pijama</span>Candy
-              </h3>
+              {/* Reemplazar texto por logotipo enlazado al home (mismo logo que en Header) */}
+              <div className="mb-4">
+                <Link href="/" aria-label="Ir al inicio">
+                  <img
+                    src="/logotipo/logo_pijamacandy_sinfondo.png"
+                    alt="PijamaCandy Logo"
+                    className="block w-40 h-auto object-contain"
+                    style={{
+                      background: 'transparent',
+                      // Suave contorno / glow blanco
+                      filter:
+                        'drop-shadow(0 0 6px rgba(255,255,255,0.45)) drop-shadow(0 0 10px rgba(255,255,255,0.25))',
+                      WebkitFilter:
+                        'drop-shadow(0 0 6px rgba(255,255,255,0.45)) drop-shadow(0 0 10px rgba(255,255,255,0.25))',
+                    }}
+                  />
+                </Link>
+              </div>
               <p className="text-gray-300 mb-4 leading-relaxed">
                 Tu destino de confianza para las pijamas más cómodas y
                 elegantes. Ofrecemos productos premium diseñados especialmente
@@ -106,7 +122,42 @@ export default function Footer() {
             </h4>
             <nav aria-label="User account navigation">
               <ul className="space-y-2">
-                {footerSections.userNavigation.map(item => (
+                <li>
+                  <Link
+                    href="/profile"
+                    className="text-gray-300 hover:text-primary-500 transition-colors"
+                  >
+                    Mi Perfil
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    href="/orders"
+                    className="text-gray-300 hover:text-primary-500 transition-colors"
+                  >
+                    Historial de Pedidos
+                  </Link>
+                </li>
+
+                <li>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      e.preventDefault()
+                      // Disparar evento para abrir el modal de wishlist en Header
+                      if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new Event('openWishlist'))
+                      }
+                    }}
+                    className="text-gray-300 hover:text-primary-500 transition-colors"
+                  >
+                    Lista de Deseos
+                  </a>
+                </li>
+
+                {/* Resto de items como Rastrear Pedido, Devoluciones */}
+                {footerSections.userNavigation.slice(3).map(item => (
                   <li key={item.name}>
                     <a
                       href={item.href}
@@ -120,7 +171,7 @@ export default function Footer() {
             </nav>
           </div>
 
-          {/* Categories */}
+          {/* Categories
           <div>
             <h4 className="text-lg font-semibold mb-4 text-primary-500">
               Categorías
@@ -139,7 +190,7 @@ export default function Footer() {
                 ))}
               </ul>
             </nav>
-          </div>
+          </div>*/}
 
           {/* Support */}
           <div>
@@ -150,12 +201,12 @@ export default function Footer() {
               <ul className="space-y-2">
                 {footerSections.support.map(item => (
                   <li key={item.name}>
-                    <a
+                    <Link
                       href={item.href}
                       className="text-gray-300 hover:text-primary-500 transition-colors"
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -199,7 +250,7 @@ export default function Footer() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-gray-400 text-sm">
-              © 2024 tupijama. All rights reserved.
+              © 2025 PijamaCandy by @BasabeCode All rights reserved
             </div>
 
             {/* Social links */}

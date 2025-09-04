@@ -163,6 +163,11 @@ export default function Header() {
       }
     }
 
+    // Escuchar evento para abrir wishlist desde otras partes (ej. footer)
+    const handleOpenWishlistEvent = () => {
+      if (mounted) setIsWishlistOpen(true)
+    }
+
     // Escuchar eventos de detalles de producto
     const handleProductDetailsEvent = (event: any) => {
       const detail = event.detail
@@ -181,6 +186,7 @@ export default function Header() {
     // Agregar event listeners
     window.addEventListener('wishlistUpdated', handleWishlistUpdate)
     window.addEventListener('openProductDetails', handleProductDetailsEvent)
+    window.addEventListener('openWishlist', handleOpenWishlistEvent)
 
     return () => {
       window.removeEventListener('wishlistUpdated', handleWishlistUpdate)
@@ -188,6 +194,7 @@ export default function Header() {
         'openProductDetails',
         handleProductDetailsEvent
       )
+      window.removeEventListener('openWishlist', handleOpenWishlistEvent)
       // Limpiar timeout de búsqueda
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current)
@@ -311,14 +318,35 @@ export default function Header() {
     }
   }
 
-  const scrollToSection = (href: string) => {
+  const scrollToSection = async (href: string) => {
     if (!mounted) return // Evitar ejecución en servidor
 
-    const element = document.querySelector(href)
+    // Asegurar que el selector comienza con '#'
+    const selector = href.startsWith('#') ? href : `#${href}`
+
+    // Intentar hacer scroll si el elemento ya está en el DOM
+    const element = document.querySelector(selector)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
+      setIsMenuOpen(false)
+      return
     }
-    setIsMenuOpen(false)
+
+    // Si no existe en esta ruta, navegar a la página de inicio con el hash
+    try {
+      // router.push con hash hará la navegación cliente y debe posicionar la página
+      await router.push(`/${selector}`)
+
+      // Reintentar scroll después de un pequeño delay para cuando el DOM se haya renderizado
+      setTimeout(() => {
+        const el = document.querySelector(selector)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    } catch (error) {
+      console.error('Error navegando a sección:', error)
+    } finally {
+      setIsMenuOpen(false)
+    }
   }
 
   // Función helper para validar URLs de imágenes
@@ -537,11 +565,11 @@ export default function Header() {
     <header className="bg-white shadow-lg sticky top-0 z-50" role="banner">
       <div className="container mx-auto px-4">
         {/* Main header - Una sola fila */}
-        <div className="flex items-center justify-between py-1 lg:py-2">
+        <div className="flex items-center justify-between py-0 lg:py-0.5">
           {/* Mobile Menu Button */}
           {mounted && (
             <button
-              className="lg:hidden p-2 text-gray-700 hover:text-rose-500 transition-colors"
+              className="lg:hidden p-1 text-gray-700 hover:text-rose-500 transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle navigation menu"
               aria-expanded={mounted ? isMenuOpen : false}
@@ -560,10 +588,10 @@ export default function Header() {
 
           {/* Logo */}
           <div className="flex items-center">
-            <div className="mr-1 w-full max-w-[240px] sm:max-w-[300px] md:max-w-[380px] lg:max-w-[520px]">
+            <div className="mr-0 py-0 w-full max-w-[240px] sm:max-w-[300px] md:max-w-[380px] lg:max-w-[520px]">
               <Link href="/" aria-label="Ir al inicio">
                 <img
-                  src="/logotipo/logo_edit_2.png"
+                  src="/logotipo/logo_pijamacandy_sinfondo.png"
                   alt="PijamaCandy Logo"
                   className="block w-full h-auto max-h-24 object-contain cursor-pointer"
                 />
@@ -588,7 +616,7 @@ export default function Header() {
                 <li key={item.name}>
                   <button
                     onClick={() => scrollToSection(item.href)}
-                    className="text-gray-700 hover:text-rose-500 font-medium transition-colors py-2 px-1 relative group"
+                    className="text-gray-700 hover:text-rose-500 font-medium transition-colors py-1 px-1 relative group"
                   >
                     {item.name}
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-rose-500 to-pink-500 transition-all duration-300 group-hover:w-full"></span>
@@ -614,7 +642,7 @@ export default function Header() {
                     setIsSearchResultsOpen(true)
                   }
                 }}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                className="w-full px-4 py-1.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
                 aria-label="Search products"
               />
               {searchQuery && (
@@ -625,7 +653,7 @@ export default function Header() {
                     setSearchResults([])
                     setIsSearchResultsOpen(false)
                   }}
-                  className="absolute right-12 top-1 h-8 w-8 text-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center"
+                  className="absolute right-12 top-0.5 h-7 w-7 text-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center"
                   aria-label="Clear search"
                 >
                   <X size={16} />
@@ -634,7 +662,7 @@ export default function Header() {
               <button
                 type="submit"
                 disabled={isLoadingProducts || isSearching}
-                className="absolute right-1 top-1 h-8 w-8 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-full hover:from-rose-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center disabled:opacity-50"
+                className="absolute right-1 top-0.5 h-7 w-7 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-full hover:from-rose-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center disabled:opacity-50"
                 aria-label="Search"
               >
                 {isLoadingProducts || isSearching ? (
@@ -752,7 +780,7 @@ export default function Header() {
             {mounted && isAdmin && (
               <Link
                 href="/admin"
-                className="hidden md:inline-flex px-3 py-2 rounded-full border border-rose-300 text-rose-600 hover:bg-rose-50 text-sm font-medium"
+                className="hidden md:inline-flex px-3 py-1 rounded-full border border-rose-300 text-rose-600 hover:bg-rose-50 text-sm font-medium"
               >
                 Admin
               </Link>
@@ -760,7 +788,7 @@ export default function Header() {
             {mounted && loggedIn && (
               <Link
                 href="/orders"
-                className="hidden md:inline-flex px-3 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-medium"
+                className="hidden md:inline-flex px-3 py-1 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-medium"
                 title="Mis pedidos"
               >
                 Pedidos
@@ -768,7 +796,7 @@ export default function Header() {
             )}
             {/* Mobile Search Button */}
             <button
-              className="md:hidden p-2 text-gray-700 hover:text-rose-500 transition-colors"
+              className="md:hidden p-1 text-gray-700 hover:text-rose-500 transition-colors"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
               aria-label="Search"
             >
@@ -779,7 +807,7 @@ export default function Header() {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={handleUserClick}
-                className="hidden sm:flex items-center space-x-1 p-2 text-gray-700 hover:text-rose-500 transition-colors"
+                className="hidden sm:flex items-center space-x-1 p-1 text-gray-700 hover:text-rose-500 transition-colors"
                 aria-label="User account"
                 title={
                   mounted
@@ -879,13 +907,13 @@ export default function Header() {
             {/* Wishlist */}
             <button
               onClick={handleWishlistClick}
-              className="hidden sm:flex relative p-2 text-gray-700 hover:text-rose-500 transition-colors"
+              className="hidden sm:flex relative p-1 text-gray-700 hover:text-rose-500 transition-colors"
               aria-label={`Wishlist with ${mounted ? wishlistCount : 0} items`}
               title="guardados"
             >
               <Heart size={20} />
               {mounted && wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistCount}
                 </span>
               )}
